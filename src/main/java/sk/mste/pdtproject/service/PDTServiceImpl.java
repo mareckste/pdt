@@ -17,4 +17,9 @@ public class PDTServiceImpl implements PDTService {
     public String findAmenities(PDTFilter PDTFilter) {
         return dbAccessor.queryData(PDTFilter, QueryType.STUDY);
     }
+
+    @Override
+    public String findParks() {
+        return dbAccessor.queryData(QueryType.STUDY);
+    }
 }

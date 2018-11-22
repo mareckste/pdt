@@ -16,6 +16,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+// TODO: 11/23/2018 refactor this class
 @Slf4j
 @Component
 public class DBAccessorImpl implements DBAccessor {
@@ -73,6 +74,42 @@ public class DBAccessorImpl implements DBAccessor {
                             resultSet.getString(2);
                             resultSet.getString(4);
                         }
+                        geoJSON.deleteCharAt(geoJSON.length()-1);
+                        geoJSON.append("]");
+                        log.info("GeoJSON contents >>>> \n{}\n", geoJSON.toString());
+                        return geoJSON.toString();
+                    }
+                });
+
+
+        return geoJSON;
+    }
+
+
+    @Override
+    public String queryData(QueryType queryType) {
+        String geoJSON = jdbcTemplate.query(
+                QueryTemplates.QUERY_PARKSHEATMAP,
+                // transform result set into our data type of geo data
+                new ResultSetExtractor<String>() {
+                    @Override
+                    public String extractData(ResultSet resultSet) throws SQLException, DataAccessException {
+                        StringBuilder geoJSON = new StringBuilder();
+
+                        geoJSON.append("[");
+                        while (resultSet.next()) {
+
+                            if (resultSet.getString(1) == null)
+                                continue;
+
+                            geoJSON.append("{")
+                                    .append("\"type\": \"Feature\", ")
+                                    .append("\"geometry\": ").append(resultSet.getString(2)).append(", ")
+                                    .append("\"properties\": {")
+                                    .append("\"title\": \"").append(resultSet.getString(1)).append("\", ")
+                                    .append("\"icon\": \"harbor\"}},");
+                        }
+
                         geoJSON.deleteCharAt(geoJSON.length()-1);
                         geoJSON.append("]");
                         log.info("GeoJSON contents >>>> \n{}\n", geoJSON.toString());

@@ -16,7 +16,15 @@ public final class QueryTemplates {
             .append("  where 1=1 ")
             .append("    and p.amenity = ANY (?) ")
             .append("    and ST_DWithin((ST_MakePoint(?, ?))::geography, ST_Transform(p.way, 4326)::geography, ?)")
-            .append("  ORDER BY distance limit ?")
+            .append("  order by distance limit ?")
+            .toString();
+
+    public static final String QUERY_PARKSHEATMAP = new StringBuilder()
+            .append(" select")
+            .append("     park_name,")
+            .append("     st_asgeojson(ST_Transform(way,4326))")
+            .append(" from parks")
+            .append(" order by st_asgeojson LIMIT 5000")
             .toString();
 
     private QueryTemplates() {}

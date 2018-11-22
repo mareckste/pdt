@@ -7,4 +7,6 @@ public interface DBAccessor {
 
     String queryData(PDTFilter PDTFilter, QueryType queryType);
 
+    String queryData(QueryType queryType);
+
 }

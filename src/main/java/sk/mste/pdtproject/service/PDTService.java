@@ -4,6 +4,7 @@ import sk.mste.pdtproject.model.PDTFilter;
 
 public interface PDTService {
 
-    public String findAmenities(PDTFilter PDTFilter);
+    String findAmenities(PDTFilter PDTFilter);
 
+    String findParks();
 }
