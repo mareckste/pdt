@@ -1,12 +1,9 @@
 package sk.mste.pdtproject.service;
 
-import sk.mste.pdtproject.model.GeoData;
-import sk.mste.pdtproject.model.GeoParams;
-
-import java.util.List;
+import sk.mste.pdtproject.model.PDTFilter;
 
 public interface PDTService {
 
-    public List<GeoData> findAmenities(GeoParams geoParams);
+    public String findAmenities(PDTFilter PDTFilter);
 
 }

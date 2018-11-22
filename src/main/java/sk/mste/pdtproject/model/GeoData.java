@@ -13,5 +13,5 @@ public class GeoData {
     private String name;
     private String amenity;
     private Object geoJSON;
-    private int distance;
+    private String distance;
 }

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
-public class GeoParams {
+public class PDTFilter {
 
     private Double lon;
     private Double lat;

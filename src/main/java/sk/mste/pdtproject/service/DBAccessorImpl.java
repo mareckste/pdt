@@ -8,16 +8,13 @@ import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
 import sk.mste.pdtproject.enumerator.QueryType;
-import sk.mste.pdtproject.model.GeoData;
-import sk.mste.pdtproject.model.GeoParams;
+import sk.mste.pdtproject.model.PDTFilter;
 import sk.mste.pdtproject.util.QueryTemplates;
 
 import java.sql.Array;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Component
@@ -30,49 +27,60 @@ public class DBAccessorImpl implements DBAccessor {
     }
 
     @Override
-    public List<GeoData> queryData(GeoParams geoParams, QueryType queryType) {
-        List<GeoData> geoDataList = jdbcTemplate.query(
+    public String queryData(PDTFilter PDTFilter, QueryType queryType) {
+        String geoJSON = jdbcTemplate.query(
                 QueryTemplates.QUERY_STUDY,
 
                 // set parameters to prepared statements
                 new PreparedStatementSetter() {
                     @Override
                     public void setValues(PreparedStatement preparedStatement) throws SQLException {
-                        Array amenities = preparedStatement.getConnection().createArrayOf("VARCHAR", geoParams.getAmenityTypes());
+                        Array amenities = preparedStatement.getConnection().createArrayOf("VARCHAR", PDTFilter.getAmenityTypes());
 
-                        preparedStatement.setDouble(1, geoParams.getLon());
-                        preparedStatement.setDouble(2, geoParams.getLat());
+                        preparedStatement.setDouble(1, PDTFilter.getLon());
+                        preparedStatement.setDouble(2, PDTFilter.getLat());
 
                         preparedStatement.setArray( 3, amenities);
 
-                        preparedStatement.setDouble(4, geoParams.getLon());
-                        preparedStatement.setDouble(5, geoParams.getLat());
+                        preparedStatement.setDouble(4, PDTFilter.getLon());
+                        preparedStatement.setDouble(5, PDTFilter.getLat());
 
-                        preparedStatement.setInt(6, geoParams.getMaxRadius());
-                        preparedStatement.setInt(7, geoParams.getMaxResults());
+                        preparedStatement.setInt(6, PDTFilter.getMaxRadius());
+                        preparedStatement.setInt(7, PDTFilter.getMaxResults());
                     }
                 },
 
                 // transform result set into our data type of geo data
-                new ResultSetExtractor<List<GeoData>>() {
+                new ResultSetExtractor<String>() {
                     @Override
-                    public List<GeoData> extractData(ResultSet resultSet) throws SQLException, DataAccessException {
-                        List<GeoData> result = new ArrayList<>();
+                    public String extractData(ResultSet resultSet) throws SQLException, DataAccessException {
+                        StringBuilder geoJSON = new StringBuilder();
+
+                        geoJSON.append("[");
                         while (resultSet.next()) {
-                            GeoData geoData = new GeoData();
-                            geoData.setName(resultSet.getString(1));
-                            geoData.setAmenity(resultSet.getString(2));
-                            geoData.setGeoJSON(resultSet.getObject(3));
-                            geoData.setDistance(resultSet.getInt(4));
 
-                            result.add(geoData);
+                            if (resultSet.getString(1) == null)
+                                continue;
+
+                            geoJSON.append("{")
+                            .append("\"type\": \"Feature\", ")
+                            .append("\"geometry\": ").append(resultSet.getString(3)).append(", ")
+                            .append("\"properties\": {")
+                                    .append("\"title\": \"").append(resultSet.getString(1)).append("\", ")
+                                    .append("\"icon\": \"harbor\"}},");
+
+
+                            resultSet.getString(2);
+                            resultSet.getString(4);
                         }
-
-                        return result;
+                        geoJSON.deleteCharAt(geoJSON.length()-1);
+                        geoJSON.append("]");
+                        log.info("GeoJSON contents >>>> \n{}\n", geoJSON.toString());
+                        return geoJSON.toString();
                     }
                 });
 
-        log.info("List size = {}", geoDataList.size());
-        return geoDataList;
+
+        return geoJSON;
     }
 }
