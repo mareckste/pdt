@@ -74,7 +74,9 @@ public class DBAccessorImpl implements DBAccessor {
                             resultSet.getString(2);
                             resultSet.getString(4);
                         }
-                        geoJSON.deleteCharAt(geoJSON.length()-1);
+                        log.info("ge {}", geoJSON.length());
+                        if (geoJSON.length() > 1)
+                            geoJSON.deleteCharAt(geoJSON.length()-1);
                         geoJSON.append("]");
                         log.info("GeoJSON contents >>>> \n{}\n", geoJSON.toString());
                         return geoJSON.toString();
@@ -104,13 +106,14 @@ public class DBAccessorImpl implements DBAccessor {
 
                             geoJSON.append("{")
                                     .append("\"type\": \"Feature\", ")
-                                    .append("\"geometry\": ").append(resultSet.getString(2)).append(", ")
+                                    .append("\"geometry\": ").append(resultSet.getString(1)).append(", ")
                                     .append("\"properties\": {")
-                                    .append("\"title\": \"").append(resultSet.getString(1)).append("\", ")
+                                    .append("\"title\": \"").append("Fire").append("\", ")
                                     .append("\"icon\": \"harbor\"}},");
                         }
-
-                        geoJSON.deleteCharAt(geoJSON.length()-1);
+                        log.info("ge {}", geoJSON.length());
+                        if (geoJSON.length() > 1)
+                            geoJSON.deleteCharAt(geoJSON.length()-1);
                         geoJSON.append("]");
                         log.info("GeoJSON contents >>>> \n{}\n", geoJSON.toString());
                         return geoJSON.toString();

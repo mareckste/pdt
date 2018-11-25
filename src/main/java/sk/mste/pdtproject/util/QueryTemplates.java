@@ -21,10 +21,9 @@ public final class QueryTemplates {
 
     public static final String QUERY_PARKSHEATMAP = new StringBuilder()
             .append(" select")
-            .append("     park_name,")
             .append("     st_asgeojson(ST_Transform(way,4326))")
-            .append(" from parks")
-            .append(" order by st_asgeojson LIMIT 5000")
+            .append(" from fires")
+            .append(" limit 1200")
             .toString();
 
     private QueryTemplates() {}
