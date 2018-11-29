@@ -36,7 +36,9 @@ public class DBAccessorImpl implements DBAccessor {
                 new PreparedStatementSetter() {
                     @Override
                     public void setValues(PreparedStatement preparedStatement) throws SQLException {
-                        Array amenities = preparedStatement.getConnection().createArrayOf("VARCHAR", PDTFilter.getAmenityTypes());
+                        Array amenities =
+                                preparedStatement.getConnection().
+                                        createArrayOf("VARCHAR", PDTFilter.getAmenityTypes());
 
                         preparedStatement.setDouble(1, PDTFilter.getLon());
                         preparedStatement.setDouble(2, PDTFilter.getLat());
@@ -90,7 +92,7 @@ public class DBAccessorImpl implements DBAccessor {
 
     @Override
     public String queryData(QueryType queryType) {
-        String geoJSON = jdbcTemplate.query(
+        return jdbcTemplate.query(
                 QueryTemplates.QUERY_PARKSHEATMAP,
                 // transform result set into our data type of geo data
                 new ResultSetExtractor<String>() {
@@ -119,8 +121,5 @@ public class DBAccessorImpl implements DBAccessor {
                         return geoJSON.toString();
                     }
                 });
-
-
-        return geoJSON;
     }
 }

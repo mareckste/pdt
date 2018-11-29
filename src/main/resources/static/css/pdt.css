@@ -1,0 +1,9 @@
+.pdt-scroll {
+    width: 100%;
+    height:329px;
+    overflow-y: scroll;
+}
+
+.nav {
+    display: block;
+}
