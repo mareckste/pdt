@@ -6,5 +6,5 @@ public interface PDTService {
 
     String findAmenities(PDTFilter PDTFilter);
 
-    String findParks();
+    String findFires();
 }

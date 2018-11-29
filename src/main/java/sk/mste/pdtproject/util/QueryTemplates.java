@@ -2,7 +2,7 @@ package sk.mste.pdtproject.util;
 
 public final class QueryTemplates {
 
-    public static final String QUERY_STUDY = new StringBuilder()
+    public static final String QUERY_INSTITUTIONS = new StringBuilder()
             .append("select")
             .append("    p.name,")
             .append("    p.amenity,")
@@ -19,8 +19,9 @@ public final class QueryTemplates {
             .append("  order by distance limit ?")
             .toString();
 
-    public static final String QUERY_PARKSHEATMAP = new StringBuilder()
+    public static final String QUERY_FIRES = new StringBuilder()
             .append(" select")
+            .append("     (VALUES ('Fire')) as title, (VALUES ('SF')) as city,")
             .append("     st_asgeojson(ST_Transform(way,4326))")
             .append(" from fires")
             .append(" limit 1200")

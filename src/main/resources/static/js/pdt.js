@@ -299,7 +299,7 @@ $(document).ready(function () {
 
             // form
             $(DOM.btn_search).click(searchInstitutions);
-            $(DOM.btn_heatmap).click(createParkHeatMap);
+            $(DOM.btn_heatmap).click(createFireHeatMap);
 
             // map
             marker.on('dragend', searchInstitutions);
@@ -330,22 +330,19 @@ $(document).ready(function () {
             // == create model/params ==
             var filter = modelCtrl.createFilter(inputData);
 
-            // == call server ==
-            ajaxCall(map, filter);
-
-            // == update UI ==
-
+            // == call server and update ui via ajax ==
+            ajaxInstitutions(map, filter);
         };
 
-        var createParkHeatMap = function () {
-            ajaxHeat(viewCtrl.getMap());
+        var createFireHeatMap = function () {
+            ajaxFireHeatMap(viewCtrl.getMap());
         };
 
         var createMap = function () {
             viewCtrl.createMap();
         };
 
-        var ajaxCall = function (map, filter) {
+        var ajaxInstitutions = function (map, filter) {
             $.ajax({
                 type: "POST",
                 contentType: "application/json",
@@ -359,7 +356,7 @@ $(document).ready(function () {
             });
         };
 
-        var ajaxHeat = function (map) {
+        var ajaxFireHeatMap = function (map) {
             $.ajax({
                 type: "GET",
                 contentType: "application/json",
@@ -381,7 +378,7 @@ $(document).ready(function () {
     })(modelController, viewController);
 
 
-    // == INIT APPLICATION ==
+    // == init application ==
     pdtController.init();
 });
 

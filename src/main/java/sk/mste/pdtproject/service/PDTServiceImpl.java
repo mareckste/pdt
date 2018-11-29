@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sk.mste.pdtproject.enumerator.QueryType;
 import sk.mste.pdtproject.model.PDTFilter;
+import sk.mste.pdtproject.util.QueryTemplates;
 
 @Slf4j
 @Service
@@ -15,11 +16,11 @@ public class PDTServiceImpl implements PDTService {
 
     @Override
     public String findAmenities(PDTFilter PDTFilter) {
-        return dbAccessor.queryData(PDTFilter, QueryType.STUDY);
+        return dbAccessor.queryData(PDTFilter, QueryType.INSTITUTIONS, QueryTemplates.QUERY_INSTITUTIONS);
     }
 
     @Override
-    public String findParks() {
-        return dbAccessor.queryData(QueryType.STUDY);
+    public String findFires() {
+        return dbAccessor.queryData(QueryType.FIRES, QueryTemplates.QUERY_FIRES);
     }
 }

@@ -29,7 +29,7 @@ public class PDTController {
     @GetMapping(Mappings.HEATMAP)
     public ResponseEntity<Object> getParksHeatMap() {
         log.info("GET heatmap");
-        String geoData = pdtService.findParks();
+        String geoData = pdtService.findFires();
         return new ResponseEntity<Object>(geoData, HttpStatus.OK);
     }
 }
