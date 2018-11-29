@@ -95,7 +95,7 @@ $(document).ready(function () {
             }
         };
 
-        var addMapDataSource = function(sourceId, data) {
+        var addMapDataSource = function (sourceId, data) {
 
             if (map.getSource(sourceId) !== undefined)
                 map.removeSource(sourceId);
@@ -109,10 +109,7 @@ $(document).ready(function () {
             });
         };
 
-        var addMapDataLayer = function (layerId, sourceId, type) {
-
-            if (map.getLayer(layerId) !== undefined)
-                map.removeLayer(layerId);
+        var addMapDataLayer = function (layerId, sourceId, type, data) {
 
             if (type === 'heatmap') {
 
@@ -120,10 +117,12 @@ $(document).ready(function () {
                 var pointId = layerId + '-point';
 
                 if (map.getLayer(heatId) !== undefined)
-                    map.removeLayer(layerId);
+                    map.removeLayer(heatId);
 
                 if (map.getLayer(pointId) !== undefined)
-                    map.removeLayer(layerId);
+                    map.removeLayer(pointId);
+
+                addMapDataSource(sourceId, data);
 
                 map.addLayer({
                     id: heatId,
@@ -221,6 +220,11 @@ $(document).ready(function () {
 
             } else {
 
+                if (map.getLayer(layerId) !== undefined)
+                    map.removeLayer(layerId);
+
+                addMapDataSource(sourceId, data);
+
                 map.addLayer({
                     "id": layerId,
                     "type": type,
@@ -279,12 +283,8 @@ $(document).ready(function () {
                 setInstitutionsList(geoData)
             },
 
-            addMapSource: function (sourceId, data) {
-                addMapDataSource(sourceId, data);
-            },
-
-            addMapLayer: function (layerId, sourceId, type) {
-                addMapDataLayer(layerId, sourceId, type);
+            addMapLayer: function (layerId, sourceId, type, data) {
+                addMapDataLayer(layerId, sourceId, type, data);
             }
         }
     })();
@@ -353,33 +353,7 @@ $(document).ready(function () {
                 url: "/search",
                 data: JSON.stringify(filter),
                 success: function (geoData) {
-
-                    if (map.getLayer("points") !== undefined)
-                        map.removeLayer("points");
-
-                    if (map.getSource('edu') !== undefined)
-                        map.removeSource('edu');
-
-                    map.addSource("edu", {
-                        "type": "geojson",
-                        "data": {
-                            "type": "FeatureCollection",
-                            "features": geoData
-                        }
-                    });
-
-                    map.addLayer({
-                        "id": "points",
-                        "type": "symbol",
-                        "source": "edu",
-                        "layout": {
-                            "icon-image": "school-15",
-                            "text-field": "{title}",
-                            "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
-                            "text-offset": [0, 0.6],
-                            "text-anchor": "top"
-                        }
-                    });
+                    viewCtrl.addMapLayer('institutions-map', 'institutions', 'symbol', geoData);
                     viewCtrl.setInstitutionsList(geoData);
                 }
             });
@@ -391,109 +365,8 @@ $(document).ready(function () {
                 contentType: "application/json",
                 dataType: 'json',
                 url: "/heatmap",
-
                 success: function (geoData) {
-
-                    map.addSource('fires', {
-                        type: 'geojson',
-                        "data": {
-                            "type": "FeatureCollection",
-                            "features": geoData
-                        }
-                    });
-
-                    map.addLayer({
-                        id: 'fires-heat',
-                        type: 'heatmap',
-                        source: 'fires',
-                        maxzoom: 15,
-                        paint: {
-                            // increase weight as diameter breast height increases
-                            'heatmap-weight': {
-                                property: 'dbh',
-                                type: 'exponential',
-                                stops: [
-                                    [1, 0],
-                                    [62, 1]
-                                ]
-                            },
-                            // increase intensity as zoom level increases
-                            'heatmap-intensity': {
-                                stops: [
-                                    [11, 1],
-                                    [15, 3]
-                                ]
-                            },
-                            // assign color values be applied to points depending on their density
-                            'heatmap-color':
-                                [
-                                    'interpolate',
-                                    ['linear'],
-                                    ['heatmap-density'],
-                                    0, 'rgba(236,222,239,0)',
-                                    0.2, 'rgb(208,209,230)',
-                                    0.4, 'rgb(166,189,219)',
-                                    0.6, 'rgb(103,169,207)',
-                                    0.8, 'rgb(28,144,153)'
-                                ],
-                            // increase radius as zoom increases
-                            'heatmap-radius': {
-                                stops: [
-                                    [11, 15],
-                                    [15, 20]
-                                ]
-                            },
-                            // decrease opacity to transition into the circle layer
-                            'heatmap-opacity': {
-                                default: 1,
-                                stops: [
-                                    [14, 1],
-                                    [15, 0]
-                                ]
-                            },
-                        }
-                    }, 'waterway-label');
-
-                    map.addLayer({
-                        id: 'fires-point',
-                        type: 'circle',
-                        source: 'fires',
-                        minzoom: 14,
-                        paint: {
-                            // increase the radius of the circle as the zoom level and dbh value increases
-                            'circle-radius': {
-                                property: 'dbh',
-                                type: 'exponential',
-                                stops: [
-                                    [{zoom: 15, value: 1}, 5],
-                                    [{zoom: 15, value: 62}, 10],
-                                    [{zoom: 22, value: 1}, 20],
-                                    [{zoom: 22, value: 62}, 50],
-                                ]
-                            },
-                            'circle-color': {
-                                property: 'dbh',
-                                type: 'exponential',
-                                stops: [
-                                    [0, 'rgba(236,222,239,0)'],
-                                    [10, 'rgb(236,222,239)'],
-                                    [20, 'rgb(208,209,230)'],
-                                    [30, 'rgb(166,189,219)'],
-                                    [40, 'rgb(103,169,207)'],
-                                    [50, 'rgb(28,144,153)'],
-                                    [60, 'rgb(1,108,89)']
-                                ]
-                            },
-                            'circle-stroke-color': 'white',
-                            'circle-stroke-width': 1,
-                            'circle-opacity': {
-                                stops: [
-                                    [14, 0],
-                                    [15, 1]
-                                ]
-                            }
-                        }
-                    }, 'waterway-label');
+                    viewCtrl.addMapLayer('fires-map', 'fires', 'heatmap', geoData);
                 }
             });
         };
