@@ -50,7 +50,7 @@ public final class QueryTemplates {
     .append("              as fire_density, ")
     .append("              l.st_asgeojson ")
     .append("       from libraries l")
-    .append("       order by fire_density").toString();
+    .append("       order by fire_density limit 1").toString();
 
     private QueryTemplates() {}
 }

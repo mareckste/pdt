@@ -20,6 +20,11 @@ public class PDTServiceImpl implements PDTService {
     }
 
     @Override
+    public String findSaveLibraries(PDTFilter PDTFilter) {
+        return dbAccessor.queryData(PDTFilter, QueryType.SAFE_LIBRARIES, QueryTemplates.QUERY_SAFE_LIBS);
+    }
+
+    @Override
     public String findFires() {
         return dbAccessor.queryData(QueryType.FIRES, QueryTemplates.QUERY_FIRES);
     }

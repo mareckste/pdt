@@ -26,6 +26,14 @@ public class PDTController {
         return new ResponseEntity<Object>(geoData, HttpStatus.OK);
     }
 
+    @PostMapping(Mappings.LIBS)
+    public ResponseEntity<Object> searchSafeLibraries(@RequestBody PDTFilter filter) {
+        log.info("Calling libs");
+        String geoData = pdtService.findSaveLibraries(filter);
+        log.info(geoData);
+        return new ResponseEntity<Object>(geoData, HttpStatus.OK);
+    }
+
     @GetMapping(Mappings.HEATMAP)
     public ResponseEntity<Object> getParksHeatMap() {
         log.info("GET heatmap");

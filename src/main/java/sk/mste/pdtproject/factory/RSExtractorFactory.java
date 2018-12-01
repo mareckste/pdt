@@ -16,8 +16,8 @@ public class RSExtractorFactory {
             geoJSON.append("[");
             while (resultSet.next()) {
 
-                String title = queryType == QueryType.INSTITUTIONS ? resultSet.getString(1)
-                        : "Fires San Francisco";
+                String title = queryType == QueryType.FIRES ? "Fires San Francisco" :
+                        resultSet.getString(1);
 
                 if (resultSet.getString(1) == null)
                     continue;

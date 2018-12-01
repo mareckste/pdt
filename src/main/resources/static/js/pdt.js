@@ -72,7 +72,7 @@ $(document).ready(function () {
         var focusMapOnInstitution = function (coordinates) {
             map.flyTo({
                 center: coordinates,
-                zoom: 18
+                zoom: 17
             });
         };
 
@@ -116,7 +116,7 @@ $(document).ready(function () {
             });
         };
 
-        var addMapDataLayer = function (layerId, sourceId, type, data) {
+        var addMapDataLayer = function (layerId, sourceId, type, data, icon) {
 
             if (type === 'heatmap') {
 
@@ -237,7 +237,7 @@ $(document).ready(function () {
                     "type": type,
                     "source": sourceId,
                     "layout": {
-                        "icon-image": "school-15",
+                        "icon-image": icon,
                         "text-field": "{title}",
                         "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
                         "text-offset": [0, 0.6],
@@ -260,6 +260,16 @@ $(document).ready(function () {
                     max_result: $(DOM_STRINGS.it_max_results).val()
                 };
 
+            },
+
+            getLibInputData: function(obj) {
+                return {
+                    lng: $(obj).data('coordinates')[0],
+                    lat: $(obj).data('coordinates')[1],
+                    amenities: checkedAmenities(),
+                    max_dist: $(DOM_STRINGS.it_max_dist).val(),
+                    max_result: $(DOM_STRINGS.it_max_results).val()
+                };
             },
 
             createMap: function () {
@@ -290,8 +300,8 @@ $(document).ready(function () {
                 setInstitutionsList(geoData)
             },
 
-            addMapLayer: function (layerId, sourceId, type, data) {
-                addMapDataLayer(layerId, sourceId, type, data);
+            addMapLayer: function (layerId, sourceId, type, data, icon) {
+                addMapDataLayer(layerId, sourceId, type, data, icon);
             }
         }
     })();
@@ -314,6 +324,7 @@ $(document).ready(function () {
             // dynamic
             $(DOM.scroll_bar).on('mouseenter', 'li a', toggleActive);
             $(DOM.scroll_bar).on('mouseleave', 'li a', toggleActive);
+            $(DOM.scroll_bar).on('click', 'button', safeLibs);
             $(DOM.scroll_bar).on('click', 'li a', function () {
                 viewCtrl.setMapFocusTo($(this).data('coordinates'));
             });
@@ -321,7 +332,6 @@ $(document).ready(function () {
         };
 
         var toggleActive = function () {
-            console.log('fire');
             var className = ' ' + this.className + ' ';
 
             this.className = ~className.indexOf(' active ') ?
@@ -347,10 +357,9 @@ $(document).ready(function () {
         };
 
         var safeLibs = function () {
-            //TODO: load data {maybe give ids to items}
-            //TODO: create filter
-            //TODO: call ajax
-            //TODO: bind this button to every a tag
+            var inputData = viewCtrl.getLibInputData($(this));
+            var filter = modelCtrl.createFilter(inputData);
+            ajaxLibs(map, filter);
         };
 
         var createMap = function () {
@@ -365,7 +374,7 @@ $(document).ready(function () {
                 url: "/search",
                 data: JSON.stringify(filter),
                 success: function (geoData) {
-                    viewCtrl.addMapLayer('institutions-map', 'institutions', 'symbol', geoData);
+                    viewCtrl.addMapLayer('institutions-map', 'institutions', 'symbol', geoData, "school-15");
                     viewCtrl.setInstitutionsList(geoData);
                 }
             });
@@ -378,7 +387,22 @@ $(document).ready(function () {
                 dataType: 'json',
                 url: "/heatmap",
                 success: function (geoData) {
-                    viewCtrl.addMapLayer('fires-map', 'fires', 'heatmap', geoData);
+                    viewCtrl.addMapLayer('fires-map', 'fires', 'heatmap', geoData, "fire");
+                }
+            });
+        };
+
+        var ajaxLibs = function (map, filter) {
+            $.ajax({
+                type: "POST",
+                contentType: "application/json",
+                dataType: 'json',
+                url: "/library",
+                data: JSON.stringify(filter),
+                success: function (geoData) {
+                    viewCtrl.addMapLayer('libraries-map', 'libraries', 'symbol', geoData, "library-15");
+                    viewCtrl.setMapFocusTo(geoData[0].geometry.coordinates);
+                    // viewCtrl.setInstitutionsList(geoData);
                 }
             });
         };

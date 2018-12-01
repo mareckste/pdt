@@ -30,7 +30,7 @@ public class DBAccessorImpl implements DBAccessor {
     public String queryData(PDTFilter PDTFilter, QueryType queryType, String queryTemplate) {
         return jdbcTemplate.query(
                 queryTemplate,
-                this.psSetterFactory.createPSSetter(PDTFilter),
+                this.psSetterFactory.createPSSetter(PDTFilter, queryType),
                 this.rsExtractorFactory.createExtractor(queryType));
     }
 
