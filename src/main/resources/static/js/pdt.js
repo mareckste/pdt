@@ -83,15 +83,22 @@ $(document).ready(function () {
             // load new data
             for (var i = 0; i < geoData.length; i++) {
                 current_coordinates = geoData[i].geometry.coordinates;
-                current_inst_name   = geoData[i].properties.title;
+                current_inst_name   = geoData[i].properties.title.substring(0, 20) + '...';
+
+                row = $('<div class="row mb-3">');
+                col_btn = $('<div class="col-3 d-flex align-items-stretch">');
+                col_link = $('<div class="col-7 d-flex align-items-stretch">');
 
                 link = $('<a class="nav-link">');
                 link.data('coordinates', current_coordinates);
                 link.text(current_inst_name);
                 link.attr('href', '#');
 
-                $(DOM_STRINGS.scroll_bar).append(
-                    $('<li class="nav-item">').append(link));
+                btn = $('<button type="button" class="btn btn-outline-success">Find Safe Library</button>');
+                btn.data('coordinates', current_coordinates);
+
+                $(DOM_STRINGS.scroll_bar).append(row.append(
+                    col_link.append($('<li class="nav-item">').append(link)), col_btn.append(btn)));
             }
         };
 
@@ -314,6 +321,7 @@ $(document).ready(function () {
         };
 
         var toggleActive = function () {
+            console.log('fire');
             var className = ' ' + this.className + ' ';
 
             this.className = ~className.indexOf(' active ') ?
@@ -336,6 +344,13 @@ $(document).ready(function () {
 
         var createFireHeatMap = function () {
             ajaxFireHeatMap(viewCtrl.getMap());
+        };
+
+        var safeLibs = function () {
+            //TODO: load data {maybe give ids to items}
+            //TODO: create filter
+            //TODO: call ajax
+            //TODO: bind this button to every a tag
         };
 
         var createMap = function () {
